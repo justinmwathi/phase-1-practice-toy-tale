@@ -1,6 +1,7 @@
 let addToy = false;
 //FETCH REQUEST
 document.addEventListener('DOMContentLoaded',()=>{
+  
   const url="http://localhost:3000/toys"
   fetch(url)
   .then(response=>response.json())
@@ -26,20 +27,7 @@ fetch(url,{
 })
 
 
-fetch(`localhost:3000/toys/${toyId}`,{
-  method:"PATCH",
 
-  headers:
-{
-  "Content-Type": "application/json",
-  Accept: "application/json"
-},
-
-body: JSON.stringify({
-  "likes": newLikes
-}),
-
-});
 
 //Handle data function
 function handleData(data){
@@ -67,21 +55,46 @@ cards.appendChild(likes);
 cards.appendChild(image);
 cards.appendChild(h2);
     toycollection.appendChild(cards);
-    const likeButtons = document.querySelectorAll(".like-btn");
+  
+  })
+likebutns=document.querySelectorAll(".like-btn");
+likebutns.forEach(button=>{
+  button.addEventListener("click",()=>{
+const toyId=button.getAttribute("id")
+const currentLikes = parseInt(button.nextElementSibling.innerText);
+const newNumberOfLikes = currentLikes + 1;
 
-    likeButtons.forEach((button) => {
-  
-      button.addEventListener("click", () => {
-  
-        const toyId = button.getAttribute("id");
-  console.log(toyId);
-        const currentLikes = button.nextElementSibling.innerText;
-  
-        const newLikes = parseInt(currentLikes) + 1;
+//PATCH REQUEST
+fetch(`http://localhost:3000/toys/${toyId}`,{
+  method: 'PATCH',
 
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json'
+  },
+
+  body: JSON.stringify({
+    likes: newNumberOfLikes
   })
 })
+
+.then(response=>{
+  if(response.ok){
+    return response.json()
+  }else{
+    throw new Error('Updating toy likes')
+  }
+})
+
+.then((data)=>{
+  const likesElement = button.nextElementSibling;
+      likesElement.innerText = `${newNumberOfLikes} likes`;
+})
   })
+})
+
+
+
 }
 });
 
